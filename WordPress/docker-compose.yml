@@ -21,7 +21,7 @@ services:
        - db_data:/var/lib/mysql
      restart: always
      environment:
-       MYSQL_ROOT_PASSWORD: hoangphuc
+       MYSQL_ROOT_PASSWORD: mysql_rootpasswd
        MYSQL_DATABASE: wordpress
        MYSQL_USER: wordpress
        MYSQL_PASSWORD: wordpress
