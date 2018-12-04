@@ -3,7 +3,7 @@ services:
   mysql:
     image: mysql:5.7
     volumes:
-      - mysql-data:/var/lib/mysql/
+      - mysql-data:/var/lib/mysql
     restart: always
     networks:
       - redmine
@@ -14,15 +14,16 @@ services:
       MYSQL_PASSWORD: redmine
 
   redmine:
-    image: redmine:latest
+    image: redmine:3.4.6-passenger
     restart: always
     networks:
       - redmine
     volumes:
       - redmine-data:/usr/src/redmine/files
     ports:
-      - "127.0.0.1:3001:3000"
+      - 3001:3000
     environment:
+      REDMINE_DB_MYSQL: mysql
       REDMINE_DB_USERNAME: redmine
       REDMINE_DB_PASSWORD: redmine
       REDMINE_DB_DATABASE: redmine
