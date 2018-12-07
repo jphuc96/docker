@@ -1,0 +1,31 @@
+version: '3'
+services:
+
+  ghost:
+    image: ghost:2.6.2
+    restart: always
+    ports:
+      - 8081:2368
+    depends_on:
+      - db
+    environment:
+      url: http://blog.sudojoss.com
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: root
+      database__connection__password: mysql_rootpasswd
+      database__connection__database: ghost
+    volumes:
+      - ghost-content:/var/lib/ghost/content
+    
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_rootpasswd
+    volumes:
+      - ghost-mysql:/var/lib/mysql
+
+volumes:
+  ghost-content:
+  ghost-mysql:
