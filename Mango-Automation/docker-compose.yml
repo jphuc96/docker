@@ -1,0 +1,23 @@
+version: '3.3'
+
+services:
+  mango:
+    image: mango-automation
+    restart: always
+    networks:
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mango"
+      # - "traefik.frontend.rule=Host:misc.sudojoss.com; PathPrefix:/mango;ReplacePathRegex: ^/mango/(.*) /$$1"
+      - "traefik.frontend.rule=Host:misc.sudojoss.com"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.port=8080"
+    ports:
+      - "8083:8080"
+    volumes:
+      - /home/jphuc96/docker_data/mango-automation/opt/mango:/opt/mango
+
+networks:
+  traefik_proxy:
+    external: true
