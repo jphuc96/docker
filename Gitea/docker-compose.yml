@@ -1,0 +1,54 @@
+version: "3.3"
+
+services:
+  gitea:
+    image: gitea/gitea:latest
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=mysql
+      - DB_HOST=db:3306
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+    restart: always
+    networks:
+      - gitea
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=gitea"
+      - "traefik.entrypoints=https"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.rule=Host:git.sudojoss.com"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.port=3000"
+    volumes:
+      - /home/jphuc96/docker_data/gitea:/data
+    ports:
+      #  - "3001:3000"
+       - "10022:22"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=gitea
+      - MYSQL_USER=gitea
+      - MYSQL_PASSWORD=gitea
+      - MYSQL_DATABASE=gitea
+    networks:
+      - gitea
+    volumes:
+      - gitea-mysql:/var/lib/mysql
+
+volumes:
+  gitea-mysql:
+
+networks:
+  gitea:
+    external: false
+  traefik_proxy:
+    external: true

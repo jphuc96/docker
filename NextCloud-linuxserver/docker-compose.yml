@@ -6,11 +6,8 @@ services:
       restart: always
       image: linuxserver/nextcloud
       volumes:
-        - /home/jphuc96/docker_data/nextcloud/config:/config
-        - /home/jphuc96/docker_data/nextcloud/data:/data
-        # - nextcloud:/
-  #    ports:
-  #      - "XXXX:443"
+        - nextcloud-config:/config
+        - nextcloud-data:/data
       environment:
         - PUID=1000
         - PGID=1000
@@ -22,31 +19,21 @@ services:
         - db
       networks:
         - traefik_proxy
+        - nextcloud
       labels:
         - "traefik.enable=true"
-        - "traefik.backend=nextcloud"
-        - "traefik.frontend.rule=Host:nextcloud.sudojoss.com"
-        - "traefik.port=443"
         - "traefik.protocol=https"
+        - "traefik.port=443"
+        - "traefik.backend=nextcloud"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.rule=Host:nextcloud.sudojoss.com"
         - "traefik.docker.network=traefik_proxy"
-        - "traefik.frontend.headers.SSLRedirect=true"
-        - "traefik.frontend.headers.STSSeconds=315360000"
-        - "traefik.frontend.headers.browserXSSFilter=true"
-        - "traefik.frontend.headers.contentTypeNosniff=true"
-        - "traefik.frontend.headers.forceSTSHeader=true"
-        - "traefik.frontend.headers.SSLHost=sudojoss.com"
-        - "traefik.frontend.headers.STSIncludeSubdomains=true"
-        - "traefik.frontend.headers.STSPreload=true"
-        - "traefik.frontend.headers.frameDeny=true" 
-
   db:
     image: mariadb
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     networks:
-      - traefik_proxy
-    labels:
-      - "traefik.enable=false"
+      - nextcloud
     volumes:
       - db:/var/lib/mysql
     environment:
@@ -57,8 +44,11 @@ services:
 
 volumes:
   db:
-  nextcloud:
+  nextcloud-data:
+  nextcloud-config:
 
 networks:
   traefik_proxy:
     external: true
+  nextcloud:
+    driver: bridge
