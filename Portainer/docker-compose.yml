@@ -1,15 +1,27 @@
-version: '2'
+version: '3.3'
 
 services:
   portainer:
     image: portainer/portainer
     restart: always
+    networks:
+      - traefik_proxy
     ports:
       - "9000:9000"
     command: -H unix:///var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=portainer"
+      - "traefik.frontend.rule=Host:www.sudojoss.com;PathPrefixStrip:/portainer"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.port=9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
 
 volumes:
   portainer_data:
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,8 @@
+version: '3.3'
+
+services:
+  cloudflare-ddns:
+    image: jphuc96/cloudflare-ddns
+    restart: always
+    env_file:
+      - /home/jphuc96/docker_data/cloudflare-ddns/cloudflare-ddns.env

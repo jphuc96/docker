@@ -1,0 +1,30 @@
+version: '3.3'
+
+services:
+  emqx:
+    image: jphuc96/emqx:latest
+    restart: always
+    ports:
+      - 1883:1883 #TCP 
+      - 8083:8083 #WS
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.backend=emq"
+      - "traefik.entrypoints=https"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.rule=Host:misc.sudojoss.com"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.port=18083"
+    networks: 
+      - traefik_proxy
+    volumes: 
+      - emqx:/opt/emqx/
+    #   - /opt/docker/emqx/data:/opt/emqx/data
+    #   - /opt/docker/emqx/etc:/opt/emqx/etc
+    #   - /opt/docker/emqx/log:/opt/emqx/log
+
+volumes: 
+  emqx:
+networks: 
+  traefik_proxy:
+    external: true

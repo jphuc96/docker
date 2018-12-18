@@ -1,16 +1,66 @@
-web:
-  image: 'gitlab/gitlab-ce:latest'
-  restart: always
-  hostname: 'gitlab.example.com'
-  environment:
-    GITLAB_OMNIBUS_CONFIG: |
-      external_url 'https://gitlab.sudojoss.com'
-  ports:
-    - '10080:80'
-    - '10443:443'
-    - '10022:22'
-  volumes:
-    - '/srv/gitlab/config:/etc/gitlab'
-    - '/srv/gitlab/logs:/var/log/gitlab'
-    - '/srv/gitlab/data:/var/opt/gitlab'
+version: '3.3'
+services:
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab.sudojoss.com'
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2G
+    healthcheck:
+      disable: true
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.sudojoss.com'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['http2_enabled'] = false
 
+        nginx['proxy_set_headers'] = {
+          "Host" => "$$http_host",
+          "X-Real-IP" => "$$remote_addr",
+          "X-Forwarded-For" => "$$proxy_add_x_forwarded_for",
+          "X-Forwarded-Proto" => "https",
+          "X-Forwarded-Ssl" => "on"
+        }
+
+        gitlab_rails['gitlab_shell_ssh_port'] = 222
+    ports:
+      # - '10080:80'
+      # - '10443:443'
+      - '222:22'
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=gitlab"
+      - "traefik.entrypoints=https"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.rule=Host:gitlab.sudojoss.com"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.port=80"
+    networks:
+        - traefik_proxy
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    volumes:
+      # Mount Docker socket for dind
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab-runner-config:/etc/gitlab-runner/
+      - gitlab-runner-data:/home/gitlab-runner/
+
+volumes: 
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:
+  gitlab-runner-config:
+  gitlab-runner-data:
+
+networks:
+  traefik_proxy:
+    external: true
