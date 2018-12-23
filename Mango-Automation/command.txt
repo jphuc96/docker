@@ -1,0 +1,1 @@
+docker run --name mango-automation --restart always -p 81:8080 -dit mango-automation bash
