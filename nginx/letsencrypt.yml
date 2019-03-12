@@ -4,8 +4,6 @@ services:
   letsencrypt:
     image: linuxserver/letsencrypt
     container_name: letsencrypt
-    networks:
-      - nginx-proxy
     ports:
       - 80:80
       - 443:443
@@ -20,7 +18,3 @@ services:
       - DNSPLUGIN=cloudflare
     volumes:
       - /opt/docker/letsencrypt:/config
-
-networks: 
-  nginx-proxy:
-    external: true

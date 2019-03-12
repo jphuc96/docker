@@ -7,8 +7,8 @@ services:
     environment: 
       - ZONE=sudojoss.com
       - HOST=ops.sudojoss.com
-      - EMAIL=jphuc96@gmail.com
-      - API=ba694ae70c9a2060b5a6b0ab8e353c5294887
+      - EMAIL=${CLOUDFLARE_EMAIL}
+      - API=${CLOUDFLARE_API_KEY}
       - TTL=1
       - PROXY=false
       
