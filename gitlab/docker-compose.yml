@@ -1,0 +1,46 @@
+version: '3.3'
+services:
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: unless-stopped
+    container_name: gitlab
+    healthcheck:
+      disable: true
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.sudojoss.com'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['http2_enabled'] = false
+
+        nginx['proxy_set_headers'] = {
+          "Host" => "$$http_host",
+          "X-Real-IP" => "$$remote_addr",
+          "X-Forwarded-For" => "$$proxy_add_x_forwarded_for",
+          "X-Forwarded-Proto" => "https",
+          "X-Forwarded-Ssl" => "on"
+        }
+
+        gitlab_rails['gitlab_shell_ssh_port'] = 222
+        gitlab_rails['gitlab_ssh_host'] = 'ops.sudojoss.com'
+    ports:
+      - '222:22'
+    volumes:
+      - /opt/docker/gitlab/gitlab/config:/etc/gitlab
+      - /opt/docker/gitlab/gitlab/logs:/var/log/gitlab
+      - /opt/docker/gitlab/gitlab/data:/var/opt/gitlab
+    networks:
+        - nginx-proxy
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/docker/gitlab/gitlab-runner/config:/etc/gitlab-runner/
+      - /opt/docker/gitlab/gitlab-runner/data:/home/gitlab-runner/
+
+networks:
+  nginx-proxy:
+    external: true

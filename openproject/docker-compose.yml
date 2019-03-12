@@ -1,0 +1,19 @@
+version: '3.3'
+services: 
+  openproject:
+    image: openproject/community:latest
+    container_name: openproject
+    restart: unless-stopped
+    environment: 
+      - SECRET_KEY_BASE=openproject_secret_key
+    networks:
+      - nginx-proxy
+    # ports: 
+    #   - 60000:80
+    volumes: 
+      - /opt/docker/openproject/posgresql:/var/lib/postgresql/9.6/main
+      - /opt/docker/openproject/data:/var/db/openproject
+
+networks:  
+  nginx-proxy:
+    external: true

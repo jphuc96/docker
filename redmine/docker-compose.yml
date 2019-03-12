@@ -1,0 +1,47 @@
+version: '3.1'
+services:
+  redmine:
+    image: redmine:3.4.6-passenger
+    container_name: redmine
+    restart: always
+    networks:
+      - internal
+      - nginx-proxy
+    volumes:
+      - redmine-files:/usr/src/redmine/files/
+      - redmine-plugins:/usr/src/redmine/plugins/
+      - redmine-themes:/usr/src/redmine/public/themes/
+    ports:
+      - 3001:3000
+    environment:
+      REDMINE_DB_MYSQL: mysql
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: redmine
+      REDMINE_DB_DATABASE: redmine
+    depends_on: 
+      - mysql
+  mysql:
+    image: mysql:5.7
+    container_name: redmine-mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+    networks:
+      - internal
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_rootpasswd
+      MYSQL_DATABASE: redmine
+      MYSQL_USER: redmine
+      MYSQL_PASSWORD: redmine
+
+volumes:
+  mysql-data:
+  redmine-files:
+  redmine-plugins:
+  redmine-themes:
+
+networks:
+  nginx-proxy:
+    external: true
+  internal:
+    driver: bridge

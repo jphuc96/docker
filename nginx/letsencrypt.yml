@@ -1,0 +1,26 @@
+ 
+version: '3.3'
+services:
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    networks:
+      - nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    environment: 
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      - EMAIL=jphuc96@gmail.com
+      - URL=sudojoss.com
+      - SUBDOMAINS=wildcard
+      - VALIDATION=dns
+      - DNSPLUGIN=cloudflare
+    volumes:
+      - /opt/docker/letsencrypt:/config
+
+networks: 
+  nginx-proxy:
+    external: true

@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  duplicati:
+    image: linuxserver/duplicati
+    container_name: duplicati
+    restart: unless-stopped
+    networks: 
+      - nginx-proxy
+    ports:
+      - 8200:8200
+    environment: 
+      - PUID=1000
+      - PGID=1000
+    volumes: 
+      - /opt/docker/duplicati/config:/config
+      - /opt/docker/duplicati/backups:/backups
+      - /opt/docker/duplicati/source:/source
+  
+networks: 
+  nginx-proxy:
+    external: true

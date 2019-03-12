@@ -1,0 +1,79 @@
+version: '3.1'
+
+networks: 
+  nginx-proxy:
+    external: true
+  internal: 
+    driver: bridge
+services:
+  owncloud:
+    image: owncloud/server:latest
+    container_name: owncloud
+    restart: always
+    networks: 
+      - nginx-proxy
+      - internal
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+      - redis
+    environment:
+      - OWNCLOUD_DOMAIN=localhost
+      - OWNCLOUD_DB_TYPE=mysql
+      - OWNCLOUD_DB_NAME=owncloud
+      - OWNCLOUD_DB_USERNAME=owncloud
+      - OWNCLOUD_DB_PASSWORD=owncloud
+      - OWNCLOUD_DB_HOST=owncloud-db
+      - OWNCLOUD_ADMIN_USERNAME=owncloud
+      - OWNCLOUD_ADMIN_PASSWORD=owncloud
+      - OWNCLOUD_MYSQL_UTF8MB4=true
+      - OWNCLOUD_REDIS_ENABLED=true
+      - OWNCLOUD_REDIS_HOST=redis
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /opt/docker/owncloud/files:/mnt/data
+      - /home/jphuc96:/ext-data/home/jphuc96
+
+
+  db:
+    image: webhippie/mariadb:latest
+    container_name: owncloud-db
+    networks:
+      - internal
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=owncloud
+      - MARIADB_USERNAME=owncloud
+      - MARIADB_PASSWORD=owncloud
+      - MARIADB_DATABASE=owncloud
+      - MARIADB_MAX_ALLOWED_PACKET=128M
+      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /opt/docker/owncloud/mysql:/var/lib/mysql
+      - /opt/docker/owncloud/backup:/var/lib/backup
+
+  redis:
+    image: webhippie/redis:latest
+    container_name: owncloud-redis
+    networks:
+      - internal
+    restart: always
+    environment:
+      - REDIS_DATABASES=1
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /opt/docker/owncloud/redis:/var/lib/redis

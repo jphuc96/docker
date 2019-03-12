@@ -1,0 +1,39 @@
+version: '3.1'
+services:
+
+  ghost:
+    image: ghost:latest
+    container_name: ghost
+    restart: always
+    networks:
+      - nginx-proxy
+      - internal
+    # ports:
+    #   - 2368:2368
+    depends_on:
+      - db
+    environment:
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: root
+      database__connection__password: mysql_rootpasswd
+      database__connection__database: ghost
+    volumes:
+      - /opt/docker/ghost/content:/var/lib/ghost/content
+      - /opt/docker/ghost/config.production.json:/var/lib/ghost/config.production.json
+  db:
+    image: mysql:5.7
+    container_name: ghost-db
+    restart: always
+    networks: 
+      - internal
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_rootpasswd
+    volumes:
+      - /opt/docker/ghost/mysql:/var/lib/mysql
+
+networks:
+  nginx-proxy:
+    external: true
+  internal:
+    driver: bridge

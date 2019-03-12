@@ -1,0 +1,38 @@
+version: '3.3'
+
+services:
+  plex:
+    image: linuxserver/plex
+    container_name: plex
+    restart: always
+    network_mode: host
+    environment: 
+      - VERSION=latest
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+    volumes: 
+      - /opt/docker/home-media/plex/transcode:/transcode
+      - /opt/docker/home-media/plex/config:/config
+      - /home/jphuc96/Data/Library:/data
+      - /home/jphuc96/Data/Learning:/data/learning
+
+  # transmission:
+  #   image: linuxserver/transmission
+  #   container_name: transmission
+  #   restart: always
+  #   networks:
+  #     - nginx-proxy
+  #   ports:
+  #     - 9091:9091
+  #     - 51413:51413
+  #     - 51413:51413/udp
+  #   environment: 
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Asia/Ho_Chi_Minh
+  #   volumes:
+  #     - /opt/docker/home-media/transmission/config:/config
+  #     - /opt/docker/home-media/transmission/watch:/watch
+  #     - /opt/docker/home-media/transmission/incomplete:/downloads/incomplete
+  #     - /home/jphuc96/Data/Library:/downloads/

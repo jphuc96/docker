@@ -1,0 +1,17 @@
+version: '3.1'
+services: 
+  aria2:
+    container_name: aria2
+    image: xujinkai/aria2-with-webui
+    ports:
+      - 6800:6800
+      - 6880:80
+      - 6888:8080
+    environment: 
+      - SECRET=hoangphuc
+      - PGID:1000
+      - PUID:1000
+    volumes:
+      - /home/jphuc96/Download:/data/
+      - /opt/docker/aria2/conf:/conf
+    restart: unless-stopped

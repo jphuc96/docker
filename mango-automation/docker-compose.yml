@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:
+  mango:
+    image: jphuc96/mango-automation
+    container_name: mango-automation
+    restart: always
+    networks:
+      - nginx-proxy
+    ports:
+      - "8083:8080"
+    volumes:
+      - /opt/docker/mango-automation/opt/mango:/opt/mango
+
+networks:
+  nginx-proxy:
+    external: true

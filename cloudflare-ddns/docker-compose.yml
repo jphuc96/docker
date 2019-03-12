@@ -1,0 +1,14 @@
+version: '3.1'
+services: 
+  cloudflare-ddns:
+    image: joshuaavalon/cloudflare-ddns
+    container_name: cloudflare-ddns
+    restart: always
+    environment: 
+      - ZONE=sudojoss.com
+      - HOST=ops.sudojoss.com
+      - EMAIL=jphuc96@gmail.com
+      - API=ba694ae70c9a2060b5a6b0ab8e353c5294887
+      - TTL=1
+      - PROXY=false
+      

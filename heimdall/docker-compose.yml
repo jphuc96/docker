@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /opt/docker/heimdall:/config
+    networks: 
+      - nginx-proxy
+    ports:
+      - 60000:80
+      # - 60000:443
+    restart: unless-stopped
+
+networks: 
+  nginx-proxy:
+    external: true

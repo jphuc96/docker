@@ -1,0 +1,43 @@
+version: '3.3'
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    user: 65534:65534
+    command: --config.file=/etc/prometheus/prometheus.yml --web.external-url=http://localhost:9090/prometheus --web.route-prefix="/"
+    networks: 
+      - nginx-proxy
+    ports:
+      - 9090:9090
+    volumes: 
+      - /opt/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /opt/docker/prometheus/data:/prometheus
+    depends_on:
+    - cadvisor
+  cadvisor:
+    image: google/cadvisor:latest
+    container_name: cadvisor
+    networks: 
+      - nginx-proxy
+    # ports:
+    # - 8080:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    - /dev/disk/:/dev/disk:ro
+    depends_on:
+    - redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks: 
+      - nginx-proxy
+    # ports:
+    # - 6379:6379
+    
+networks: 
+  nginx-proxy:
+    external: true

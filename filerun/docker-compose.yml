@@ -1,0 +1,55 @@
+version: '3.3'
+
+services:
+  db:
+    image: mariadb:10.1
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_rootpasswd
+      MYSQL_USER: filerun
+      MYSQL_PASSWORD: filerun
+      MYSQL_DATABASE: filerun
+      TZ: 'Asia/Ho_Chi_Minh'
+    networks: 
+      - filerun
+    volumes:
+      - /opt/docker/filerun/db:/var/lib/mysql
+  web:
+    image: jphuc96/filerun
+    restart: unless-stopped
+    environment:
+      FR_DB_HOST: db
+      FR_DB_PORT: 3306
+      FR_DB_NAME: filerun
+      FR_DB_USER: filerun
+      FR_DB_PASS: filerun
+      APACHE_RUN_USER: 1000
+      APACHE_RUN_GROUP: 1000
+      APACHE_RUN_USER_ID: 1000
+      APACHE_RUN_GROUP_ID: 1000 
+    depends_on:
+      - db
+    links:
+      - db:db
+    networks: 
+      - filerun
+      - traefik_proxy
+    ports:
+      - "8000:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=filerun"
+      - "traefik.entrypoints=https"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.rule=Host:f.sudojoss.com"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.port=80"
+    volumes:
+      - /opt/docker/filerun/html:/var/www/html
+      - /home/jphuc96:/user-files
+
+networks: 
+  filerun:
+    driver: bridge
+  traefik_proxy:
+    external: true
